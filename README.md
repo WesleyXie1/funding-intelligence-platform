@@ -1,70 +1,214 @@
-# funding intelligence platform
-AI powered faculty funding matching and outreach platform using embeddings, LLM reranking, and Gemini integration.
-
-
-Proposed Process with Gemini Agent Interface
-
+# Proposed Process with Gemini Agent Interface
 
 ## Step 1. Funding Opportunity Input through Gemini Agent
-The user interacts with the system through a Gemini-based agent interface and provides a federal funding opportunity URL (e.g., NSF, NIH, or DOE) or funding text. The Gemini agent serves as the conversational front end, collecting the funding information and forwarding it to the backend matching engine. The system then extracts and processes key content from the funding announcement, including the program description, research priorities, eligibility requirements, deadlines, and major topic areas. If the webpage cannot be parsed automatically, the agent prompts the user to provide the funding text manually.
 
-## Step 2. Funding Theme Extraction (transfer to machine code)
-The extracted funding text is processed by a large language model to identify the core themes of the opportunity. These may include research domains, methods, target populations, application areas, eligibility constraints, and strategic priorities.
-The output is a structured funding profile, including a short summary, key research themes, methods, target areas, eligibility notes, and potential faculty-relevant keywords.
+Users interact with the system through a Gemini-based agent interface and provide a federal funding opportunity URL (e.g., NSF, NIH, DOE) or funding text. The Gemini agent serves as the conversational front end, collecting funding information and forwarding it to the backend matching engine.
 
-Step 3. Faculty Database Retrieval
-The faculty database contains public information such as faculty name, department, research interests, faculty webpage, selected publications, and recent research topics.
+The system extracts and processes key information from the funding announcement, including the program description, research priorities, eligibility requirements, deadlines, and major topic areas. If automatic webpage extraction fails, the agent prompts the user to provide the funding text manually.
 
-Step 4. Embedding Retrieval Using Cosine Similarity (transfer the non direct wording to keyword for matching)
-The structured funding profile and faculty research profiles are converted into numerical embeddings using a pretrained language model. These embeddings capture the semantic meaning of the text in a high-dimensional vector space, allowing conceptually related topics to be matched even when different terminology is used.
-The system then computes the cosine similarity between the funding embedding and each faculty embedding. Cosine similarity measures the alignment between two embeddings and serves as an estimate of semantic relevance.
-This retrieval stage enables efficient screening across a large faculty database and identifies an initial pool of potentially relevant faculty members. Rather than relying solely on exact keyword matches, the embedding-based approach can detect broader conceptual relationships between funding priorities and faculty research interests.
-Faculty members with the highest similarity scores are selected as candidates for further evaluation in the ranking and reranking stages.
+---
 
+## Step 2. Funding Profile Construction
 
-Step 5. Faculty Ranking with Weighted Scoring (to save token)
-After the initial embedding retrieval, the system calculates a weighted match score for each faculty member. The score combines multiple components, such as:
-Semantic similarity between the funding and faculty profile: 40%
-Research interest overlap: 25%
-Recent publication relevance: 25%
-Department or center affiliation fit: 10%
-This produces an initial ranked list of faculty members who are likely to be relevant to the opportunity.
+The extracted funding text is processed by a large language model to construct a structured funding profile.
 
-Step 6. LLM-Based Reranking with GPT
-The top-ranked faculty candidates are then reviewed by a large language model, such as GPT. Instead of relying only on cosine similarity, GPT reads the funding summary, the faculty research profile, and recent publication information.
-GPT evaluates the match based on topical fit, methodological fit, application fit, eligibility fit, and likelihood of faculty interest. It assigns a refined score and provides a short explanation for why the faculty member is or is not a strong match.
-This step acts as a second-stage expert review after the embedding-based retrieval stage.
+The model identifies key information such as:
 
-Step 7. Evidence Based Recommendation
-For each recommended faculty member, the system provides an evidence-based explanation. This includes the specific overlap between the funding opportunity and the professor’s research, such as shared keywords, related methods, relevant publication topics, or matching application areas.
+* Research domains
+* Methodologies
+* Target populations
+* Application areas
+* Eligibility constraints
+* Strategic priorities
 
-Step 8. Mail Merge Draft Generation
-After the final faculty list is produced, the system generates outreach drafts. It can create a group email for a broader set of faculty or personalized emails for highly matched faculty members.
-The draft email includes the funding opportunity, the reason it may be relevant, and a short call to action, such as inviting the faculty member to contact the Office of Research Development for support.
+The output includes a concise funding summary, research themes, methodological keywords, target areas, eligibility notes, and faculty-relevant concepts for downstream analysis.
 
-Step 9. Gemini Agent Response and User Review
-The backend returns the ranked faculty list, match explanations, and email drafts to the Gemini agent. The Gemini agent presents the results in a user-friendly format and allows the user to ask follow-up questions, such as:
-“Why was this professor ranked highly?”
-“Generate a shorter version of the group email.”
-“Only include faculty from the Statistics Department.”
-“Export this list for mail merge.”
+---
 
+## Step 3. Faculty Database Retrieval
 
-Step 10. Human Review and Export
-The final output is not sent automatically. Instead, the system produces a reviewable faculty ranking, match explanations, and email drafts. Users can export the results to CSV, Excel, or a mail merge format for manual review and final editing.
-The human user remains responsible for final decisions, editing, and sending.
+The system retrieves faculty information from a curated faculty database.
 
-System Architecture Summary
+Faculty profiles may include:
+
+* Faculty name
+* Department and affiliations
+* Research interests
+* Faculty webpage
+* Selected publications
+* Recent research topics
+* Research centers and institutes
+
+This database serves as the primary knowledge source for faculty matching and recommendation.
+
+---
+
+## Step 4. Embedding-Based Faculty Retrieval
+
+The structured funding profile and faculty research profiles are converted into numerical embeddings using a pretrained language model.
+
+Embeddings represent the semantic meaning of text in a high-dimensional vector space, allowing conceptually related topics to be matched even when different terminology is used.
+
+The system computes cosine similarity between the funding embedding and each faculty embedding:
+
+Similarity(F,P) = (F · P) / (||F|| ||P||)
+
+where:
+
+* F = funding opportunity embedding
+* P = faculty profile embedding
+
+This retrieval stage enables efficient screening across a large faculty database and identifies an initial pool of potentially relevant faculty members.
+
+Unlike traditional keyword-based matching, the embedding-based approach captures broader semantic relationships between funding priorities and faculty research interests.
+
+Faculty members with the highest similarity scores are selected for further evaluation.
+
+---
+
+## Step 5. Faculty Ranking with Weighted Scoring
+
+After the retrieval stage, the system computes an initial faculty match score using a weighted scoring framework:
+
+Score = 0.40 × Semantic Similarity
++ 0.25 × Research Interest Overlap
++ 0.25 × Publication Relevance
++ 0.10 × Affiliation Fit
+
+Components include:
+
+* Semantic Similarity (40%)
+* Research Interest Overlap (25%)
+* Publication Relevance (25%)
+* Department or Center Affiliation Fit (10%)
+
+This step generates an initial ranked list of faculty members most relevant to the funding opportunity.
+
+---
+
+## Step 6. LLM-Based Reranking
+
+The top-ranked faculty candidates are then reviewed by a large language model such as GPT.
+
+Rather than relying solely on embedding similarity scores, GPT evaluates:
+
+* Topical fit
+* Methodological fit
+* Application fit
+* Eligibility fit
+* Likelihood of faculty interest
+
+The model assigns a refined relevance score and generates a concise explanation describing why each faculty member is or is not a strong match.
+
+This stage functions as a second-level expert review layer that improves recommendation quality and interpretability.
+
+---
+
+## Step 7. Evidence-Based Recommendation
+
+For each recommended faculty member, the system generates an evidence-based justification.
+
+Recommendations may reference:
+
+* Shared research themes
+* Overlapping methodologies
+* Relevant publication topics
+* Matching application domains
+* Strategic alignment with funding priorities
+
+The objective is not only to identify relevant faculty members but also to provide transparent reasoning behind each recommendation.
+
+---
+
+## Step 8. Mail Merge Draft Generation
+
+After the final faculty ranking is produced, the system generates outreach drafts.
+
+Supported outputs include:
+
+* Group emails for broader faculty audiences
+* Personalized outreach emails for highly matched faculty members
+
+Each draft includes:
+
+* Funding opportunity information
+* Match rationale
+* Suggested next steps
+* Contact information for the Office of Research Development
+
+---
+
+## Step 9. Gemini Agent Response and User Review
+
+The backend matching engine returns ranked faculty recommendations, evidence summaries, and email drafts to the Gemini agent.
+
+The Gemini interface presents results conversationally and supports follow-up interactions such as:
+
+* "Why was this faculty member ranked highly?"
+* "Generate a shorter version of the email."
+* "Show only Statistics faculty."
+* "Export results for mail merge."
+
+This enables users to iteratively refine recommendations through natural language interaction.
+
+---
+
+## Step 10. Human Review and Export
+
+The system does not automatically send emails.
+
+Instead, it produces a reviewable set of:
+
+* Faculty rankings
+* Recommendation explanations
+* Outreach drafts
+
+Users may export results to CSV, Excel, or mail merge formats for final review and distribution.
+
+Human users remain responsible for final decisions, editing, and communication.
+
+---
+
+# System Architecture Summary
+
 Gemini Agent Interface
-→ User submits funding URL or funding text
-→ Gemini sends request to backend API
-→ Python matching engine extracts and summarizes funding content
-→ Embedding retrieval identifies candidate faculty
-→ Weighted scoring ranks faculty
-→ GPT reranks and explains matches
-→ Email drafts are generated
-→ Gemini presents results conversationally
-→ User reviews and exports results
 
+↓
+
+Funding Opportunity Input
+
+↓
+
+Funding Profile Construction
+
+↓
+
+Faculty Database Retrieval
+
+↓
+
+Embedding-Based Faculty Retrieval
+
+↓
+
+Weighted Faculty Ranking
+
+↓
+
+LLM-Based Reranking
+
+↓
+
+Evidence-Based Recommendation
+
+↓
+
+Mail Merge Draft Generation
+
+↓
+
+User Review and Export
+
+---
 
 
