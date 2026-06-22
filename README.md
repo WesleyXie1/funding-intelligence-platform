@@ -3,10 +3,12 @@ AI powered faculty funding matching and outreach platform using embeddings, LLM 
 
 
 Proposed Process with Gemini Agent Interface
-Step 1. Funding Opportunity Input through Gemini Agent
+
+
+## Step 1. Funding Opportunity Input through Gemini Agent
 The user interacts with the system through a Gemini-based agent interface and provides a federal funding opportunity URL (e.g., NSF, NIH, or DOE) or funding text. The Gemini agent serves as the conversational front end, collecting the funding information and forwarding it to the backend matching engine. The system then extracts and processes key content from the funding announcement, including the program description, research priorities, eligibility requirements, deadlines, and major topic areas. If the webpage cannot be parsed automatically, the agent prompts the user to provide the funding text manually.
 
-Step 2. Funding Theme Extraction (transfer to machine code)
+## Step 2. Funding Theme Extraction (transfer to machine code)
 The extracted funding text is processed by a large language model to identify the core themes of the opportunity. These may include research domains, methods, target populations, application areas, eligibility constraints, and strategic priorities.
 The output is a structured funding profile, including a short summary, key research themes, methods, target areas, eligibility notes, and potential faculty-relevant keywords.
 
